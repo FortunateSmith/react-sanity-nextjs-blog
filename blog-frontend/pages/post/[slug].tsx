@@ -1,7 +1,7 @@
 import client from "../../client";
 
 const Post = (props: any) => {
-  const { title = 'emptyString', name = 'emptyString' } = props.post
+  const { title = 'Missing title', name = 'Missing name' } = props.post
   return (
     <article>
       <h1>{title}</h1>
