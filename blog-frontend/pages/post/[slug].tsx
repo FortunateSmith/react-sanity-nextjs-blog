@@ -1,8 +1,17 @@
 import client from "../../client";
 import groq from "groq";
+import imageUrlBuilder from "@sanity/image-url";
+import { PortableText } from "@portabletext/react";
+
+function urlFor(source: any) {
+  return imageUrlBuilder(client).image(source)
+}
+
+
 
 const Post = (props: any) => {
-  const { title = 'Missing title', name = 'Missing name', categories } = props.post
+  const { title = 'Missing title', name = 'Missing name', categories, authorImage } = props.post
+  console.log("PROPS", props)
   return (
     <article>
       <h1>{title}</h1>
@@ -13,16 +22,24 @@ const Post = (props: any) => {
           {categories.map((category: any) => <li key={category}>{category}</li>)}
         </ul>
       )}
+      {authorImage && (
+        <div>
+          <img 
+          src={urlFor(authorImage)
+          .width(125)
+          .url()}></img>
+        </div>
+      )}
     </article>
   );
 };
 
-
 // categories[]->title, means loop through array of categories and extract titles from associated categories
 const query = groq`*[_type == "post" && slug.current == $slug][0]{
-  title,
+  "title": title,
   "name" : author->name,
   "categories" : categories[]->title,
+  "authorImage" : author->image
 }`
 
 console.log("Qweery", query);
@@ -49,7 +66,7 @@ export async function getStaticProps(context: any) {
   // console.log('Query:', `*[_type = "post" && slug.current == ${slug}][0]`);
   const post = await client.fetch(query, {slug}
   );
-    // console.log(`*********************************** Slug:`, post)
+    console.log(`*********************************** Slug:`, post)
   return {
     props: {
       post,
